@@ -10,7 +10,7 @@ export class User {
     email: string;
     @Column()
     password: string;
-    @Column()
+    @Column({default: 'user'})
     role: string;
     @Column()
     createdAt: Date;

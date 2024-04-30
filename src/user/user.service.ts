@@ -45,12 +45,21 @@ export class UserService {
     }
   }
 
-  findOne(id: number) {
-    const user = this.userRepository.findOne({where: {id}});
+  async findOne(id: number) {
+    const user = await this.userRepository.findOne({where: {id}});
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    delete user.password;
     return user;
+  }
+
+  async findAll() {
+    const users = await this.userRepository.find();
+    users.forEach(user => {
+      delete user.password;
+    });
+    return users;
   }
 
   async updateById(id: number, updateUserDto: UpdateUserDto) {
