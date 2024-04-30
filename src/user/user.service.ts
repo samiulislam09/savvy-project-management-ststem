@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
+import { access } from 'fs';
 
 @Injectable()
 export class UserService {
@@ -28,6 +29,7 @@ export class UserService {
     user.password = hash;
     return this.userRepository.save(user);
   }
+
   async login(loginUserDto: LoginUserDto) {
     const user = await this.userRepository.findOne({where: {email: loginUserDto.email}});
     if (!user) {
@@ -37,8 +39,10 @@ export class UserService {
     if (!match) {
       throw new NotFoundException('Invalid credentials');
     }
-    const token = await this.jwtService.signAsync({id: user.id});
-    return {token};
+    const payload = {id: user.id, email: user.email};
+    return {
+      access_token: this.jwtService.sign(payload)
+    }
   }
 
   findOne(id: number) {
